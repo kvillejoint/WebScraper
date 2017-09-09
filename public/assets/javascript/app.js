@@ -14,14 +14,14 @@ $.getJSON("/articles", function(data) {
 
 });
 
-//click listener for users clicking on p tag
+//click listener for notes clicking on p tag
 $(document).on("click", "p", function() {
     console.log("Clicked on paragraph");
     //empty notes section
     $("#notes").empty();
     //save id from p tag
     let thisId = $(this).attr("data-id");
-
+    console.log(thisId)
     //ajax call for article
     $.ajax({
         method: "GET",
@@ -29,28 +29,29 @@ $(document).on("click", "p", function() {
     })
     //add note info to page when done
     .done(function(data) {
-        console.log(this);
+        console.log(data);
+        console.log(this)
         //add article title
-        $("#users").append("<h2>" + data.title + "</h2>");
+        $("#notes").append("<h2>" + data.title + "</h2>");
         // An input to enter a new title
-        $("#users").append("<input id='titleinput' name='title' >");
-        // A textarea to add a new users body
-        $("#users").append("<textarea id='bodyinput' name='body'></textarea>");
-        // A button to submit a new users, with the id of the article saved to it
-        $("#users").append("<button data-id='" + data._id + "' id='saveusers'>Save users</button>");
+        $("#notes").append("<input id='titleinput' name='title' >");
+        // A textarea to add a new notes body
+        $("#notes").append("<textarea id='bodyinput' name='body'></textarea>");
+        // A button to submit a new notes, with the id of the article saved to it
+        $("#notes").append("<button data-id='" + data._id + "' id='savenotes'>Save Note</button>");
 
-        // If there's a users in the article
-        if (data.users) {
-        // Place the title of the users in the title input
-        $("#titleinput").val(data.users.title);
-        // Place the body of the users in the body text area
-        $("#bodyinput").val(data.users.body);
+        // If there's a notes in the article
+        if (data.notes) {
+        // Place the title of the notes in the title input
+        $("#titleinput").val(data.notes.title);
+        // Place the body of the notes in the body text area
+        $("#bodyinput").val(data.notes.body);
       }
     });
 });
 
-// When you click the save users button
-$(document).on("click", "#saveusers", function() {
+// When you click the save notes button
+$(document).on("click", "#savenotes", function() {
     // Grab the id associated with the article from the submit button
     var thisId = $(this).attr("data-id");
   
@@ -70,10 +71,10 @@ $(document).on("click", "#saveusers", function() {
         // Log the response
         console.log(data);
         // Empty the notes section
-        $("#users").empty();
+        $("#notes").empty();
       });
   
-    // Also, remove the values entered in the input and textarea for users entry
+    // Also, remove the values entered in the input and textarea for notes entry
     $("#titleinput").val("");
     $("#bodyinput").val("");
   });

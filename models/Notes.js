@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 //schema for users
-let UsersSchema = new Schema({
+let NotesSchema = new Schema({
     title: {
         type: String
     },
@@ -15,6 +15,6 @@ let UsersSchema = new Schema({
 });
 
 //coment model for the CommentSchema created
-let Users = mongoose.model("Users", UsersSchema);
+let Notes = mongoose.model("Notes", NotesSchema);
 
-module.exports = Users;
+module.exports = Notes;

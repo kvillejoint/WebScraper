@@ -1,28 +1,29 @@
 // Dependencies
 let express = require("express");
 let bodyParser = require("body-parser");
-let logger = require("morgan");
+//let logger = require("morgan");
 let mongoose = require("mongoose");
-// Require Article and Users models
+// Require Article and Notes models
 let Article = require("./models/Article.js");
-let Users = require("./models/Users.js");
+let Notes = require("./models/Notes.js");
 // Scraping tools
 let request = require("request");
 let cheerio = require("cheerio");
 // Set moongoose to leverage built in JavaScript ES6 Promises
 mongoose.Promise = Promise;
 
+var PORT = process.env.PORT || 4000;
+
 // Initialize Express
 let app = express();
-// Use morgan and body parser
-app.use(logger("dev"));
+// Use body parser
 app.use(bodyParser.urlencoded({
     extended: false
 }));
 // Make the static directory public
 app.use(express.static("public"));
 // database configuration with mongoose
-mongoose.connect("mongodb://localhost/week18day3mongoose");
+mongoose.connect("mongodb://kvillejoint:password@ds129004.mlab.com:29004/heroku_p84fqm1h");
 let db = mongoose.connection;
 // show mongoose errors
 db.on("error", function(error) {
@@ -49,19 +50,26 @@ app.get("/scrape", function(req, res) {
                 //create text and href for each link and save as properties of result object
                 result.title = $(this).children("a").text();
                 result.link = $(this).children("a").attr("href");
-                //Create new entry using Aticle model
-                let entry = new Article(result);
-                //save entry to the database
-                entry.save(function(err, doc) {
-                    //log any errors
-                    if (err) {
-                        console.log(err);
-                    }
-                    //else log the document
-                    else {
-                        console.log(doc);
-                    }
-                });
+
+                if (result.title === undefined || result.link === undefined) {
+                  console.log("invalid article")
+                }
+                else {
+                  //Create new entry using Aticle model
+                  let entry = new Article(result);
+                  //save entry to the database
+                  entry.save(function(err, doc) {
+                      //log any errors
+                      if (err) {
+                          console.log(err);
+                      }
+                      //else log the document
+                      else {
+                          console.log(doc);
+                      }
+                  });
+                }
+               
             });
         });
         //send results to browser when finished scraping the text.
@@ -77,6 +85,7 @@ app.get("/scrape", function(req, res) {
         res.send(error);
       } else {
         res.json(doc);
+        console.log(doc);
       }
     });
     
@@ -85,16 +94,18 @@ app.get("/scrape", function(req, res) {
     // This will grab an article by it's ObjectId
     app.get("/articles/:id", function(req, res) {
       // Use req.params.id to find one article
+      console.log(req.params.id);
     Article.findOne({ " _id": req.params.id})
       // Run the populate method with "note",
       .populate("note")
       // Respond with the article with the note included
       .exec(function(error, doc) {
         if (error) {
-          res.send(error);
+          console.log(error);
         }
         else {
           res.json(doc);
+          console.log(doc)
         }
       });
     });
@@ -140,6 +151,6 @@ app.get("/scrape", function(req, res) {
 */
 
     // Listen on port 4000
-    app.listen(4000, function() {
-      console.log("App running on port 4000!");
+    app.listen(PORT, function() {
+      console.log("App running on PORT: " + PORT);
     });
